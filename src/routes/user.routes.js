@@ -1,4 +1,6 @@
 import { Router } from "express";
+import validate from "../middlewares/validate.middleware.js";
+
 import {
   register,
   login,
@@ -17,9 +19,9 @@ import {
 
 const router = Router();
 
-router.post("/register", registerLimiter, validateRegister, register);
+router.post("/register", registerLimiter, validateRegister, validate, register);
 
-router.post("/login", loginLimiter, validateLogin, login);
+router.post("/login", loginLimiter, validateLogin, validate, login);
 
 router.post("/refresh-token", refreshLimiter, refreshAccessToken);
 

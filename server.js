@@ -7,8 +7,10 @@ import globalErrorHandler from "./src/middlewares/error.middlware.js";
 import eventRoutes from "./src/routes/event.routes.js";
 import seatRoutes from "./src/routes/seat.routes.js";
 import helmet from "helmet";
+import morgan from "morgan";
 
 const app = express();
+app.use(morgan("dev"));
 
 app.use(cors());
 app.use(express.json());
@@ -26,6 +28,7 @@ app.use("/api/seats", seatRoutes);
 
 app.use(globalErrorHandler);
 app.use(helmet());
+app.use(morgan("dev"));
 
 app.listen(PORT, () => {
   console.log(`Backend server running on PORT ${PORT}`);

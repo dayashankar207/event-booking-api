@@ -1,4 +1,4 @@
-import { body, validationResult } from "express-validator";
+import { body } from "express-validator";
 
 const createEventValidator = [
   body("title")
@@ -19,15 +19,6 @@ const createEventValidator = [
       }
       return true;
     }),
-
-  // central place to check validation results
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
 ];
 
 const updateEventValidator = [
@@ -47,13 +38,5 @@ const updateEventValidator = [
       }
       return true;
     }),
-
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
 ];
 export { createEventValidator, updateEventValidator };
