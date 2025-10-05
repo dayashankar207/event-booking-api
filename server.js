@@ -6,6 +6,7 @@ import userRoutes from "./src/routes/user.routes.js";
 import globalErrorHandler from "./src/middlewares/error.middlware.js";
 import eventRoutes from "./src/routes/event.routes.js";
 import seatRoutes from "./src/routes/seat.routes.js";
+import bookingRoutes from "./src/routes/booking.routes.js";
 import helmet from "helmet";
 import morgan from "morgan";
 
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/seats", seatRoutes);
+app.use("/api/booking", bookingRoutes);
 
 app.use(globalErrorHandler);
 app.use(helmet());
