@@ -7,78 +7,79 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  name      String?
-  password  String
-  role      Role       @default(USER)   // RBAC role
-  bookings  Booking[]
-
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  @@map("users")
-}
-
 enum Role {
   USER
   ADMIN
 }
 
+enum SeatStatus {
+  AVAILABLE
+  RESERVED
+  BOOKED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  EXPIRED
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  password  String
+  role      Role       @default(USER) 
+  bookings  Booking[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
+}
+
 model Event {
-  id        String     @id @default(uuid())
+  id        String    @id @default(uuid())
   title     String
   date      DateTime
   seats     Seat[]
   bookings  Booking[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   @@map("events")
 }
 
 model Seat {
-  id        String      @id @default(uuid())
-  number    String       //e.g., "A1" , "B2"
-  status    SeatStatus  @default(AVAILABLE)
+  id        String     @id @default(uuid())
+  number    String
+  status    SeatStatus @default(AVAILABLE)
   eventId   String
-  event     Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  booking   Booking?
+  event     Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  booking   Booking[]
 
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
-  @@unique([eventId, number]) // no duplicate seat numbers within same event
+  @@unique([eventId, number])  // no duplicate seat numbers within same event
   @@map("seats")
 }
 
-enum SeatStatus {
-  AVAILABLE
-  BOOKED
-}
-
-enum OrderStatus {
-  CONFIRMED @map("confirmed")
-  PENDING   @map("pending")
-  CANCELLED @map("cancelled")
-}
-
 model Booking {
-  id       String       @id @default(uuid())
-  userId   String
-  eventId  String
-  seatId   String
-  status   OrderStatus  @default(PENDING) 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String      @id @default(uuid())
+  userId     String
+  eventId    String
+  seatId     String
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  expiresAt  DateTime?   // set for pending holds
 
-  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  seat     Seat   @relation(fields: [seatId], references: [id], onDelete: Cascade)
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event      Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  seat       Seat   @relation(fields: [seatId], references: [id], onDelete: Cascade)
 
-  @@unique([seatId])           // one booking per seat
-  @@unique([eventId, seatId])  // ensures seat belongs to a specific event
+  @@unique([eventId, seatId, status], name: "unique_event_seat_status") // prevents two CONFIRMED for same seat+event if you filter by status later; we'll rely on service checks for PENDING->CONFIRMED race
   @@map("bookings")
 }

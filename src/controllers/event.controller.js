@@ -2,14 +2,14 @@ import * as eventModel from "../models/event.model.js";
 
 export const createEvent = async (req, res, next) => {
   try {
-    const { title, date } = req.body;
+    const { title } = req.body;
 
-    if (!title || !date) {
-      return res.status(400).json({ error: "Title and Date is required" });
+    if (!title) {
+      return res.status(400).json({ error: "Title is required" });
     }
     const event = await eventModel.createEvent({
       title,
-      date: new Date(date),
+      date: new Date(),
     });
     res.status(201).json({ message: "Event created successfully", event });
   } catch (err) {

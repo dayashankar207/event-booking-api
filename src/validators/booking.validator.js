@@ -1,17 +1,15 @@
-import { body, param } from "express-validator";
-
-const allowedStatuses = ["CONFIRMED", "PENDING", "CANCELLED"];
+import { body } from "express-validator";
 
 export const validateCreateBooking = [
-  body("userId").notEmpty().withMessage("User ID is required"),
-  body("seatId").notEmpty().withMessage("Seat ID is required"),
-  body("status")
-    .isIn(allowedStatuses)
-    .withMessage(
-      `Booking status must be one of: ${allowedStatuses.join(", ")}`
-    ),
-];
+  body("eventId")
+    .notEmpty()
+    .withMessage("eventId is required")
+    .isUUID()
+    .withMessage("Invalid eventId format"),
 
-export const validateCancelBooking = [
-  param("bookingId").isUUID().withMessage("Invalid booking ID format"),
+  body("seatId")
+    .notEmpty()
+    .withMessage("seatId is required")
+    .isUUID()
+    .withMessage("Invalid seatId format"),
 ];

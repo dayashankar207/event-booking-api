@@ -9,6 +9,7 @@ import seatRoutes from "./src/routes/seat.routes.js";
 import bookingRoutes from "./src/routes/booking.routes.js";
 import helmet from "helmet";
 import morgan from "morgan";
+import "./src/cron/expireBookings.cron.js";
 
 const app = express();
 app.use(morgan("dev"));
