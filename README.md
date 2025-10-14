@@ -1,4 +1,3 @@
-```markdown
 # Event Booking System (Backend)
 
 ![Node.js](https://img.shields.io/badge/Node.js-v22.17.0-green)
@@ -16,7 +15,8 @@
 - [Environment Variables](#environment-variables)
 - [API Endpoints](#api-endpoints)
 - [Cron Jobs](#cron-jobs)
-- [Examples](#json-api-examples)
+- [Seeding Database](#seeding-database)
+- [JSON API Examples](#json-api-examples)
 - [Future Enhancements](#future-enhancements)
 
 ---
@@ -59,7 +59,7 @@ bunx prisma migrate dev --name init
 bunx prisma generate
 
 # Run seed script
-bunx prisma db seed
+bunx prisma db seed --admin-account
 ```
 
 ## Environment Variables
@@ -74,8 +74,8 @@ PORT=5000
 NODE_ENV=production
 CRON_ENABLED=true
 DEFAULT_PENDING_MS=600000 # 10 mins
-ADMIN_EMAIL= example@admin.com
-ADMIN_PASSWORD= examplePassword123
+ADMIN_EMAIL=example@admin.com
+ADMIN_PASSWORD=examplePassword123
 ```
 
 ## API Endpoints
@@ -88,7 +88,6 @@ ADMIN_PASSWORD= examplePassword123
 | PATCH  | `/api/booking/:id/cancel`  | Cancel a booking                    | USER          |
 | GET    | `/api/booking/:id`         | Get booking by ID                   | USER / ADMIN  |
 
-
 ## Cron Jobs
 
 Booking Expiration: Every minute, checks for bookings with status PENDING that have passed expiresAt.
@@ -97,15 +96,27 @@ Automatically cancels expired bookings and sets seat status back to AVAILABLE.
 
 Controlled via CRON_ENABLED=true.
 
+## Seeding Database
+
+To populate initial users, events, and seats:
+
+```bash
+bunx prisma db seed --admin-account
+```
+
+The seed file is located at prisma/seed.js. Modify it to create your initial users, events, and seats.
+
 ## JSON API Examples
 
 1. Create Booking
 
 Request
 
+```bash
 POST /api/booking
 Authorization: Bearer <ACCESS_TOKEN>
 Content-Type: application/json
+```
 
 ```json
 {
@@ -137,8 +148,10 @@ Response (201 Created)
 
 Request
 
+```bash
 PATCH /api/booking/a1f5ed23-1c91-4874-8ed3-c00803d65dc6/confirm
 Authorization: Bearer <ACCESS_TOKEN>
+```
 
 Response (200 OK)
 
@@ -159,8 +172,10 @@ Response (200 OK)
 
 Request
 
+```bash
 PATCH /api/booking/a1f5ed23-1c91-4874-8ed3-c00803d65dc6/cancel
 Authorization: Bearer <ACCESS_TOKEN>
+```
 
 Response (200 OK)
 
@@ -180,8 +195,10 @@ Response (200 OK)
 
 Request
 
+```bash
 GET /api/booking/a1f5ed23-1c91-4874-8ed3-c00803d65dc6
 Authorization: Bearer <ACCESS_TOKEN>
+```
 
 Response (200 OK)
 
@@ -197,4 +214,10 @@ Response (200 OK)
   "expiresAt": "2025-10-11T10:53:49.022Z"
 }
 ```
+
+## Future Enhancements
+
+- Add more endpoints for events and seats management
+- Implement email notifications for booking confirmations
+- Add payment integration
 ```
