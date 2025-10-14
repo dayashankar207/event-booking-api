@@ -1,3 +1,4 @@
+```markdown
 # Event Booking System (Backend)
 
 ![Node.js](https://img.shields.io/badge/Node.js-v22.17.0-green)
@@ -56,14 +57,17 @@ bun dev
 # Prisma migrations
 bunx prisma migrate dev --name init
 bunx prisma generate
+
+# Run seed script
+bunx prisma db seed
 ```
 
 ## Environment Variables
 
-Create a .env file in the root directory:
+Create a `.env` file in the root directory:
 
+```env
 DATABASE_URL="postgresql://postgres:password@localhost:5432/booking"
-REDIS_URL="redis://127.0.0.1:6379"
 JWT_SECRET=your_jwt_secret
 JWT_REFRESH_SECRET=your_jwt_refresh_secret
 PORT=5000
@@ -72,6 +76,7 @@ CRON_ENABLED=true
 DEFAULT_PENDING_MS=600000 # 10 mins
 ADMIN_EMAIL= example@admin.com
 ADMIN_PASSWORD= examplePassword123
+```
 
 ## API Endpoints
 
@@ -102,14 +107,17 @@ POST /api/booking
 Authorization: Bearer <ACCESS_TOKEN>
 Content-Type: application/json
 
-```{
+```json
+{
   "eventId": "89688e8e-2c6c-46d7-9c84-044c7ec78dc7",
   "seatId": "47afdf10-bcf7-4b1f-9c28-d310c1c6f452"
-}```
+}
+```
 
 Response (201 Created)
 
-```{
+```json
+{
   "success": true,
   "message": "Booking created successfully (PENDING)",
   "data": {
@@ -122,7 +130,8 @@ Response (201 Created)
     "seat": { "number": "A1", "status": "RESERVED" },
     "event": { "title": "Rock Concert", "date": "2025-10-15T19:00:00.000Z" }
   }
-}```
+}
+```
 
 2. Confirm Booking
 
@@ -133,7 +142,8 @@ Authorization: Bearer <ACCESS_TOKEN>
 
 Response (200 OK)
 
-```{
+```json
+{
   "success": true,
   "message": "Booking confirmed",
   "data": {
@@ -142,7 +152,8 @@ Response (200 OK)
     "seat": { "number": "A1", "status": "BOOKED" },
     "event": { "title": "Rock Concert", "date": "2025-10-15T19:00:00.000Z" }
   }
-}```
+}
+```
 
 3. Cancel Booking
 
@@ -153,7 +164,8 @@ Authorization: Bearer <ACCESS_TOKEN>
 
 Response (200 OK)
 
-```{
+```json
+{
   "success": true,
   "message": "Booking cancelled",
   "data": {
@@ -161,7 +173,8 @@ Response (200 OK)
     "status": "CANCELLED",
     "seat": { "number": "A1", "status": "AVAILABLE" }
   }
-}```
+}
+```
 
 4. Get Booking by ID
 
@@ -172,7 +185,8 @@ Authorization: Bearer <ACCESS_TOKEN>
 
 Response (200 OK)
 
-```{
+```json
+{
   "id": "a1f5ed23-1c91-4874-8ed3-c00803d65dc6",
   "status": "CONFIRMED",
   "user": { "name": "Daya Shankar" },
@@ -181,5 +195,6 @@ Response (200 OK)
   "createdAt": "2025-10-11T10:48:49.022Z",
   "updatedAt": "2025-10-11T10:50:00.000Z",
   "expiresAt": "2025-10-11T10:53:49.022Z"
-}```
-
+}
+```
+```
