@@ -55,16 +55,17 @@ export const createBooking = async ({
   return booking;
 };
 
-export const confirmBooking = async (bookingId, userId, isAdmin) => {
-  const booking = prisma.booking.findUnique({
+export const confirmBooking = async (bookingId, userId) => {
+  const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { seat: true },
   });
   if (!booking) {
     const error = new Error("Booking not found");
     error.statusCode = 404;
     throw error;
   }
+  console.log("DEBUG BOOKING:", booking);
+
   if (booking.status !== "PENDING") {
     const error = new Error(
       `Cannot confirm a booking with status ${booking.status}`
@@ -72,5 +73,68 @@ export const confirmBooking = async (bookingId, userId, isAdmin) => {
     error.statusCode = 400;
     throw error;
   }
-  if(booking.expiresAt)
+  if (booking.expiresAt && booking.expiresAt < new Date()) {
+    const error = new Error("Booking expired. Cannot confirm");
+    error.statusCode = 410;
+    throw error;
+  }
+  if (booking.userId !== userId) {
+    const error = new Error("Not authorized to confirm this booking");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const updatedBooking = await prisma.booking.update({
+    where: { id: bookingId },
+    data: { status: "CONFIRMED", seat: { update: { status: "BOOKED" } } },
+    include: { seat: true, event: true },
+  });
+  return updatedBooking;
+};
+
+export const getBookingById = async (bookingId) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      user: { select: { name: true, email: true } },
+      event: true,
+      seat: true,
+    },
+  });
+  if (!booking) {
+    const error = new Error(`Booking with Id: ${bookingId} not found`);
+    error.statusCode = 404;
+    throw error;
+  }
+  return booking;
+};
+
+export const cancelBooking = async (bookingId, user) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+  });
+  if (!booking) {
+    const error = new Error("Booking not found");
+    error.statusCode = 404;
+    throw error;
+  }
+  if (user.role === "USER" && booking.status !== "PENDING") {
+    const error = new Error("You can only cancel pending bookings ");
+    error.statusCode = 403;
+    throw error;
+  }
+  await prisma.seat.update({
+    where: { id: booking.seatId },
+    data: { status: "AVAILABLE" },
+  });
+
+  const updatedBooking = await prisma.booking.update({
+    where: { id: bookingId },
+    data: { status: "CANCELLED" },
+    include: {
+      seat: { select: { number: true } },
+      user: { select: { name: true } },
+    },
+  });
+  return updatedBooking;
 };

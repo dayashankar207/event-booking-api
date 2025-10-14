@@ -36,3 +36,47 @@ export const createBooking = async (req, res, next) => {
     next(err);
   }
 };
+
+export const confirmBooking = async (req, res, next) => {
+  try {
+    const { bookingId } = req.params;
+    const userId = req.user.id;
+
+    const booking = await bookingService.confirmBooking(bookingId, userId);
+    res.status(200).json({
+      success: true,
+      message: "Booking confirmed successfully",
+      data: booking,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getBookingById = async (req, res, next) => {
+  try {
+    const { bookingId } = req.params;
+    const booking = await bookingService.getBookingById(bookingId);
+
+    res.status(200).json(booking);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const cancelBooking = async (req, res, next) => {
+  try {
+    const { bookingId } = req.params;
+    const user = req.user;
+
+    const result = await bookingService.cancelBooking(bookingId, user);
+
+    res.status(200).json({
+      success: true,
+      message: "Booking cancelled successfully",
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

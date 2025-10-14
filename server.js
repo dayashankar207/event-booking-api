@@ -9,7 +9,7 @@ import seatRoutes from "./src/routes/seat.routes.js";
 import bookingRoutes from "./src/routes/booking.routes.js";
 import helmet from "helmet";
 import morgan from "morgan";
-import "./src/cron/expireBookings.cron.js";
+import { expireBookings } from "./src/cron/expireBookings.cron.js";
 
 const app = express();
 app.use(morgan("dev"));
@@ -20,10 +20,6 @@ app.use(cookieParser());
 
 const PORT = process.env.PORT || 5000;
 
-app.get("/", (req, res) => {
-  res.send("🚀 API is running...");
-});
-
 app.use("/api/user", userRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/seats", seatRoutes);
@@ -32,6 +28,8 @@ app.use("/api/booking", bookingRoutes);
 app.use(globalErrorHandler);
 app.use(helmet());
 app.use(morgan("dev"));
+
+expireBookings();
 
 app.listen(PORT, () => {
   console.log(`Backend server running on PORT ${PORT}`);
